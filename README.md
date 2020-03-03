@@ -12,4 +12,6 @@ origin	git@github.com:Beeep-CornellTech/data-processing.git (fetch)
 origin	git@github.com:Beeep-CornellTech/data-processing.git (push)
 </pre>
 
+Python naming convention: ![python naming convention](https://i.stack.imgur.com/Ty2F3.png)
+
 Once you have commited code to your repo, create a pull request and one of us will need to peer-review and approve the request.
