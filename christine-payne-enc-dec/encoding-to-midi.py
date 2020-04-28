@@ -4,13 +4,30 @@ import json
 import argparse
 import os
 
-instr_programs_to_keep = [0, 40, 32, 35, 24]
+
+## jazz
+# instr_programs_to_keep = [0, 40, 32, 35, 24]
+# instr_prefix_mapping = {
+# 	'p' : 0,
+# 	'v' : 40,
+# 	'a': 32,
+# 	'f': 35,
+# 	'g' : 24
+# }
+
+## metal
+instr_programs_to_keep = [19, 4, 30, -1, 29, 34, 27, 25]
+
+## metal
 instr_prefix_mapping = {
-	'p' : 0,
-	'v' : 40,
-	'a': 32,
-	'f': 35,
-	'g' : 24
+	'p': -1, ## drums (percussion)
+	'c': 19, ## church organ
+	'e': 4,  ## electric piano
+	'd': 30, ## distortion guitar
+	'o': 29, ## overdriven guitar
+	'b': 34, ## electric bass
+	'g': 27, ## electric guitars
+	'a': 25  ## acoustic guitar steel
 }
 
 num_instruments = len(instr_programs_to_keep)
@@ -58,6 +75,7 @@ def arrToStreamNotewise(score, sample_freq, note_offset):
 				add_wait = 1
 
 			try: 
+
 				pitch = int(score[i][1:])+note_offset
 				start = time_offset*speed
 				end = start + duration*speed
@@ -71,15 +89,15 @@ def arrToStreamNotewise(score, sample_freq, note_offset):
 				print(e)
 				print("Unknown note: " + score[i])
 
-			
 			time_offset+=add_wait
-
 
 	decoded_midi = pretty_midi.PrettyMIDI()
 	for instr_program in instr_programs_to_keep:
 		pm_instr = pretty_midi.Instrument(program=instr_program)
+		if instr_program == -1:
+			pm_instr = pretty_midi.Instrument(program=0, is_drum=True)	
+		
 		instr_idx = instr_programs_to_keep.index(instr_program)
-
 		for n in instrument_notes[instr_idx]:
 			pm_instr.notes.append(n)
 
@@ -102,6 +120,7 @@ if __name__ == '__main__':
 	parser.add_argument('--output', dest="output", help="Specify directory path to store decoded midi files")                     
 	parser.add_argument("--sample_freq", dest="sample_freq", help="Split beat into 4 or 12 parts", type=int)
 	parser.add_argument("--note_range", dest="note_range", help="Set 38/62 note range", type=int)
+	parser.add_argument("--style", dest="style", help="style of music")
 	args = parser.parse_args()
 
 	if not os.path.isdir(args.enc_dir):
@@ -118,7 +137,12 @@ if __name__ == '__main__':
 
 	(_,_,files) = next(os.walk(args.enc_dir))
 	enc_files = [f for f in files if '.txt' in f]
+
+	if not os.path.exists(os.path.join(args.output, args.style)):
+		os.makedirs(os.path.join(args.output, args.style))
+
 	for enc_f in enc_files:
 		with open(os.path.join(args.enc_dir, enc_f)) as f:
 			data = f.read()
-			write_mid_mp3_wav(data, enc_f[:-4] + '.mid', args.sample_freq, note_offset, args.output)
+			write_mid_mp3_wav(data, enc_f[:-4] + '.mid', args.sample_freq, note_offset, os.path.join(args.output, args.style))
+

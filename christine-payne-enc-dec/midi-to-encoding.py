@@ -10,15 +10,46 @@ import pretty_midi
 #piano, violin, acoustic bass, fretless bass, guitar
 #0, 40, 32, 35, 24
 #############
-instr_programs_to_keep = [0, 40, 32, 35, 24]
+
+## jazz
+#instr_programs_to_keep = [0, 40, 32, 35, 24]
+
+### Jazz mapping
+# instr_prefix_mapping = {
+#     0: 'p',
+#     40: 'v',
+#     32: 'a',
+#     35: 'f',
+#     24: 'g'
+# }
+
+## metal
+instr_programs_to_keep = [19, 4, 30, -1, 29, 34, 27, 25]
+
+## metal
 instr_prefix_mapping = {
-    0: 'p',
-    40: 'v',
-    32: 'a',
-    35: 'f',
-    24: 'g'
+    -1: 'p', ## drums (percussion)
+    19: 'c', ## church organ
+    4: 'e',  ## electric piano
+    30: 'd', ## distortion guitar
+    29: 'o', ## overdriven guitar
+    34: 'b', ## electric bass
+    27: 'g', ## electric guitars
+    25: 'a'  ## acoustic guitar steel
 }
-instr_programs_mapping = {} # FILL if instruments are mapped
+
+instr_programs_mapping = {
+    19: [50,42,41,109,20,53,9,80,85,81,87,31,120,35, 48, 49],
+    4:  [5],
+    30: [],
+    -1:  [117, 112, 93, 91,95, 94, 118],
+    29: [],
+    34: [33, 36, 32],
+    27: [68, 45, 110, 69, 71, 86, 82, 26],
+    25: [40, 41, 22, 24, 106]
+} # FILL if instruments are mapped
+
+include_percussion = True
 
 
 instr_mapping = None
@@ -52,6 +83,13 @@ def stream_to_chordwise(s, note_range, note_offset, sample_freq):
     ## smaller notes are now sample_freq times longer
     for instr in s.instruments:
         instrumentID = instr.program
+        if instr.is_drum == True:
+            if include_percussion == False:
+                continue ## skip if include_percussion is False
+            else:
+                if instrumentID == 0:
+                    instrumentID = -1 ## hardcoded for drums here
+
         if not instrumentID in instr_programs_to_keep:
             mapped_id = get_mapping_for_instr(instrumentID)
             if mapped_id == -1:
