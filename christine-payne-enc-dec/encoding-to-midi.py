@@ -3,7 +3,7 @@ import pretty_midi
 import json
 import argparse
 import os
-
+from tqdm import tqdm
 
 ## jazz
 # instr_programs_to_keep = [0, 40, 32, 35, 24]
@@ -141,7 +141,8 @@ if __name__ == '__main__':
 	if not os.path.exists(os.path.join(args.output, args.style)):
 		os.makedirs(os.path.join(args.output, args.style))
 
-	for enc_f in enc_files:
+	for i in tqdm(range(len(enc_files))):
+		enc_f = enc_files[i]
 		with open(os.path.join(args.enc_dir, enc_f)) as f:
 			data = f.read()
 			write_mid_mp3_wav(data, enc_f[:-4] + '.mid', args.sample_freq, note_offset, os.path.join(args.output, args.style))
