@@ -254,6 +254,7 @@ def main(midi_dir, replace, output_folder, style):
     for midi_file in midi_files:
         print("Processing file: {}/{}".format((f_idx + 1), len(midi_files)))
         translate_piece(midi_dir, midi_file, output_folder, sample_freqs, note_ranges, note_offsets, replace, style)
+        f_idx += 1
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser() 
